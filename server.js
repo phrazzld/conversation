@@ -34,6 +34,7 @@ app.post('/api/message', async (req, res) => {
     );
     res.send(message);
   } catch (err) {
+    console.log('err:', err);
     res.status(500).send(err);
   }
 });
