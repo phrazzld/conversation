@@ -75,16 +75,18 @@ const queryAgent = async (projectId = config.robopetersonProjectId, query) => {
   return response;
 };
 
+const getMessageFromBlob = blob => {
+  return blob.queryResult.fulfillmentText;
+};
+
 const processIncomingMessage = async (req, res) => {
-  console.log('Processing incoming message...');
-  console.log('req.body:', req.body);
-  console.log('req.body.query:', req.body.query);
   try {
-    let message = await queryAgent(
+    const responseBlob = await queryAgent(
       config.robopetersonProjectId,
       req.body.query,
     );
-    res.status(200).json({blob: message});
+    const message = getMessageFromBlob(responseBlob);
+    res.status(200).json({message: message});
   } catch (err) {
     console.error('err:', err);
     res.status(500).json({error: err});
