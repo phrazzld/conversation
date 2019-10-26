@@ -14,6 +14,12 @@ const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const Firestore = require('@google-cloud/firestore');
+
+const db = new Firestore({
+  projectId: config.robopetersonProjectId,
+  keyFilename: process.env.GCP_KEY_FILE,
+});
 
 app.use(helmet());
 app.use(
@@ -62,7 +68,10 @@ const generateDialogflowRequest = (query, languageCode, formattedSession) => {
   };
 };
 
-const generateNewSession = (client, projectId) => {
+const generateNewSession = (
+  client,
+  projectId = config.robopetersonProjectId,
+) => {
   return client.sessionPath(projectId, generateSessionId());
 };
 
@@ -79,16 +88,61 @@ const getMessageFromBlob = blob => {
   return blob.queryResult.fulfillmentText;
 };
 
+const saveUserMessage = async (userMessage, deviceId) => {
+  const now = new Date();
+  try {
+    const messageRef = db.collection('messages').add({
+      message: userMessage,
+      from: deviceId,
+      to: config.robopetersonProjectId,
+      createdAt: now,
+      updatedAt: now,
+    });
+    console.log(
+      `Saved incoming message (id: ${messageRef.id}):\n"${userMessage}"\n\t(${deviceId})`,
+    );
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error saving user message:', err);
+  }
+};
+
+const saveRoboPetersonMessage = async (roboPetersonMessage, deviceId) => {
+  const now = new Date();
+  try {
+    const messageRef = db.collection('messages').add({
+      message: roboPetersonMessage,
+      from: config.robopetersonProjectId,
+      to: deviceId,
+      createdAt: now,
+      updatedAt: now,
+    });
+    console.log(
+      `Saved outgoing message (id: ${messageRef.id}:\n"${roboPetersonMessage}"\n\tFrom: ${config.robopetersonProjectId}\n\tTo: ${deviceId})`,
+    );
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error saving robopeterson message:', err);
+  }
+};
+
 const processIncomingMessage = async (req, res) => {
   try {
+    const userMessage = req.body.query;
+    const deviceId = req.body.deviceId;
+    await saveUserMessage(userMessage, deviceId);
     const responseBlob = await queryAgent(
       config.robopetersonProjectId,
-      req.body.query,
+      userMessage,
     );
     const message = getMessageFromBlob(responseBlob);
+    let docRef = await db.collection('messages').add({
+      deviceId: deviceId,
+      message: message,
+    });
     res.status(200).json({message: message});
   } catch (err) {
-    console.error('err:', err);
+    console.error('Error:', err);
     res.status(500).json({error: err});
   }
 };
