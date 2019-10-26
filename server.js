@@ -47,16 +47,16 @@ const generateSessionId = () => {
   return uuid.v4();
 };
 
-const generateDialogflowRequest = (text, languageCode) => {
+const generateDialogflowRequest = (query, languageCode, formattedSession) => {
   console.log(
-    `generateDialogflowRequest({ text: ${text}, languageCode: ${languageCode} })`,
+    `generateDialogflowRequest({ text: ${query}, languageCode: ${languageCode} })`,
   );
   return {
-    session: sessionPath,
+    session: formattedSession,
     queryInput: {
       text: {
         text: query,
-        languageCode: languageCode || 'en-US',
+        languageCode: languageCode,
       },
     },
   };
@@ -70,7 +70,7 @@ const generateNewSession = projectId => {
 
 const queryAgent = async (projectId = config.robopetersonProjectId, query) => {
   const formattedSession = generateNewSession(projectId);
-  const request = generateDialogflowRequest(query, formattedSession);
+  const request = generateDialogflowRequest(query, 'en-US', formattedSession);
   const responses = await client.detectIntent(request);
   const response = responses[0];
   return response;
