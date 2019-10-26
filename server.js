@@ -135,12 +135,9 @@ const processIncomingMessage = async (req, res) => {
       config.robopetersonProjectId,
       userMessage,
     );
-    const message = getMessageFromBlob(responseBlob);
-    let docRef = await db.collection('messages').add({
-      deviceId: deviceId,
-      message: message,
-    });
-    res.status(200).json({message: message});
+    const roboPetersonMessage = getMessageFromBlob(responseBlob);
+    await saveRoboPetersonMessage(roboPetersonMessage, deviceId);
+    res.status(200).json({message: roboPetersonMessage});
   } catch (err) {
     console.error('Error:', err);
     res.status(500).json({error: err});
