@@ -30,9 +30,8 @@
     "mocha": "*"
   },
   "_moduleAliases": {
-    "@root": "src",
-    "@routes": "src/routes",
-    "@controllers": "src/controllers",
-    "@test": "test"
+    "@root": "",
+    "@routes": "routes",
+    "@controllers": "controllers"
   }
 }

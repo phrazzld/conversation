@@ -1,44 +1,102 @@
 // robopeterson-api/server.js
+// Client sends message
+// Forward message to robopeterson
+// Save client message and robopeterson response
+// Rerender messages thread on client (initiated by client)
 
+require('module-alias/register');
 const express = require('express');
 const app = express();
-const config = require('./config');
-
+const config = require('@root/config');
 const dialogflow = require('dialogflow');
 const uuid = require('uuid');
+const helmet = require('helmet');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const path = require('path');
 
-async function queryAgent(projectId = config.ROBOPETERSON_PROJECT_ID, query) {
-  const sessionId = uuid.v4();
-  const sessionClient = new dialogflow.SessionsClient();
-  const sessionPath = sessionClient.sessionPath(projectId, sessionId);
-  const langCode = 'en-US';
-  const request = {
+app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+    },
+  }),
+);
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(
+  helmet.featurePolicy({
+    features: {
+      vibrate: ["'none'"],
+      payment: ["'none'"],
+      syncXhr: ["'none'"],
+      notifications: ["'none'"],
+      microphone: ["'none'"],
+      camera: ["'none'"],
+      geolocation: ["'none'"],
+    },
+  }),
+);
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+app.use(cookieParser());
+
+const generateSessionId = () => {
+  return uuid.v4();
+};
+
+const generateDialogflowRequest = (text, languageCode) => {
+  console.log(
+    `generateDialogflowRequest({ text: ${text}, languageCode: ${languageCode} })`,
+  );
+  return {
     session: sessionPath,
     queryInput: {
       text: {
         text: query,
-        languageCode: langCode,
+        languageCode: languageCode || 'en-US',
       },
     },
   };
-  const responses = await sessionClient.detectIntent(request);
-  const response = responses[0].queryResult.fulfillmentText;
-  return response;
-}
+};
 
-app.post('/api/message', async (req, res) => {
+const generateNewSession = projectId => {
+  const client = new dialogflow.v2.SessionsClient();
+  const formattedSession = client.sessionPath(projectId, generateSessionId());
+  return formattedSession;
+};
+
+const queryAgent = async (projectId = config.robopetersonProjectId, query) => {
+  const formattedSession = generateNewSession(projectId);
+  const request = generateDialogflowRequest(query, formattedSession);
+  const responses = await client.detectIntent(request);
+  const response = responses[0];
+  return response;
+};
+
+const processIncomingMessage = async (req, res) => {
+  console.log('Processing incoming message:');
+  console.log(req);
   try {
     let message = await queryAgent(
-      config.ROBOPETERSON_PROJECT_ID,
+      config.robopetersonProjectId,
       req.query.query,
     );
-    res.send(message);
+    res.status(200).json({blob: message});
   } catch (err) {
-    console.log('err:', err);
-    res.status(500).send(err);
+    console.error('err:', err);
+    res.status(500).json({error: err});
   }
-});
+};
 
-app.listen(config.PORT, () => {
-  console.log(`RoboPeterson operational, listening on port ${config.PORT}`);
+app.post('/api/message', processIncomingMessage);
+
+app.listen(config.port, err => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(`RoboPeterson operational, listening on port ${config.port}`);
+  }
 });
