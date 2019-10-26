@@ -49,7 +49,7 @@ const generateSessionId = () => {
 
 const generateDialogflowRequest = (query, languageCode, formattedSession) => {
   console.log(
-    `generateDialogflowRequest({ text: ${query}, languageCode: ${languageCode} })`,
+    `generateDialogflowRequest({ text: ${query}, languageCode: ${languageCode}, formattedSession: ${formattedSession} })`,
   );
   return {
     session: formattedSession,
@@ -62,14 +62,13 @@ const generateDialogflowRequest = (query, languageCode, formattedSession) => {
   };
 };
 
-const generateNewSession = projectId => {
-  const client = new dialogflow.v2.SessionsClient();
-  const formattedSession = client.sessionPath(projectId, generateSessionId());
-  return formattedSession;
+const generateNewSession = (client, projectId) => {
+  return client.sessionPath(projectId, generateSessionId());
 };
 
 const queryAgent = async (projectId = config.robopetersonProjectId, query) => {
-  const formattedSession = generateNewSession(projectId);
+  const client = new dialogflow.v2.SessionsClient();
+  const formattedSession = generateNewSession(client, projectId);
   const request = generateDialogflowRequest(query, 'en-US', formattedSession);
   const responses = await client.detectIntent(request);
   const response = responses[0];
@@ -79,6 +78,8 @@ const queryAgent = async (projectId = config.robopetersonProjectId, query) => {
 const processIncomingMessage = async (req, res) => {
   console.log('Processing incoming message:');
   console.log(req);
+  console.log('req.query:', req.query);
+  console.log('req.query.query:', req.query.query);
   try {
     let message = await queryAgent(
       config.robopetersonProjectId,
