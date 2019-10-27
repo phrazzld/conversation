@@ -32,9 +32,7 @@ const saveUserMessage = async (userMessage, deviceId) => {
       createdAt: now,
       updatedAt: now,
     });
-    console.log(
-      `Saved incoming message (id: ${messageRef.id}):\n"${userMessage}"\n\t(${deviceId})`,
-    );
+    console.log(`Saved incoming message (id: ${messageRef.id})`);
   } catch (err) {
     handleDbError(err, 'Problem saving user message');
   }
@@ -51,9 +49,7 @@ const saveAgentMessage = async (agentMessage, deviceId) => {
       createdAt: now,
       updatedAt: now,
     });
-    console.log(
-      `Saved outgoing message (id: ${messageRef.id}:\n"${agentMessage}"\n\tFrom: ${config.robopetersonProjectId}\n\tTo: ${deviceId})`,
-    );
+    console.log(`Saved outgoing message (id: ${messageRef.id})`);
   } catch (err) {
     handleDbError(err, 'Problem saving robopeterson message');
   }

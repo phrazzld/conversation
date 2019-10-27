@@ -4,8 +4,12 @@
   "description": "API for the RoboPeterson Dialogflow agent.",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
-    "preinstall": "node gcpSetup.js"
+    "build": "npm run clean && babel -d ./build ./src -s",
+    "start": "npm run build && nodemon ./src/server.js | bunyan",
+    "clean": "rm -rf ./build && mkdir build",
+    "heroku-postbuild": "npm install && npm run build",
+    "preinstall": "node ./gcpSetup.js",
+    "test": "mocha | bunyan"
   },
   "author": "Phaedrus Raznikov",
   "license": "ISC",
@@ -31,8 +35,9 @@
     "mocha": "*"
   },
   "_moduleAliases": {
-    "@root": "",
-    "@routes": "routes",
-    "@controllers": "controllers"
+    "@root": "src",
+    "@routes": "src/routes",
+    "@controllers": "src/controllers",
+    "@test": "test"
   }
 }
