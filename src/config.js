@@ -3,7 +3,10 @@
 const bunyan = require('bunyan');
 
 module.exports = {
-  robopetersonProjectId: 'robopeterson-95686',
+  robopetersonProjectId:
+    process.env.ROBOPETERSON_ENV === 'PROD'
+      ? 'robopeterson-95686'
+      : 'robopeterson-test',
   port: process.env.PORT || 8080,
   loggers: {
     dev: () => bunyan.createLogger({name: 'dev', level: 'debug'}),
