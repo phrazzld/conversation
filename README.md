@@ -1,7 +1,7 @@
 # RoboPeterson API
 
-Node API for interfacing with the Dialogflow chatbot, RoboPeterson. MongoDB for storing messages and users.
+API for the RoboPeterson chatbot. Built with Node, Express, Firebase, and Dialogflow.
 
 ## License
 
-MIT
+[MIT](https://opensource.org/licenses/MIT)
