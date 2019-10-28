@@ -10,9 +10,6 @@ const generateSessionId = () => {
 };
 
 const generateDialogflowRequest = (query, languageCode, formattedSession) => {
-  console.log(
-    `generateDialogflowRequest({\n\ttext: ${query},\n\tlanguageCode: ${languageCode},\n\tformattedSession: ${formattedSession}\n})`,
-  );
   return {
     session: formattedSession,
     queryInput: {
