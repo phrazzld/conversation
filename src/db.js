@@ -15,6 +15,7 @@ const handleDbError = (err, message) => {
 };
 
 const getMessages = async deviceId => {
+  console.log('db.getMessages | deviceId:', deviceId);
   return db
     .collection('messages')
     .where('device', '==', deviceId)

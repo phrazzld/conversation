@@ -96,8 +96,10 @@ const formatMessages = snapshot => {
 };
 
 const getMessages = async (req, res) => {
+  console.log('getMessages()');
   try {
     rejectInvalidGetMessagesRequests(req, res);
+    console.log('req.params.deviceId:', req.params.deviceId);
     const snapshot = await db.getMessages(req.params.deviceId);
     if (snapshot.empty) {
       console.log('No matching documents');
