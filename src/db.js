@@ -14,10 +14,6 @@ const handleDbError = (err, message) => {
   throw new Error(`${message}:\n${err}`);
 };
 
-const getMemes = async () => {
-  return db.collection('memes').get();
-};
-
 const getMessages = async deviceId => {
   return db
     .collection('messages')
@@ -63,5 +59,4 @@ module.exports = {
   saveAgentMessage,
   saveUserMessage,
   getMessages,
-  getMemes,
 };
