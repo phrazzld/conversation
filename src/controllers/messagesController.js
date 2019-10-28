@@ -79,8 +79,10 @@ const rejectInvalidGetMessagesRequests = (req, res) => {
 };
 
 const formatMessages = snapshot => {
+  console.log('formatMessages');
   let messages = [];
   snapshot.forEach(doc => {
+    console.log('doc.data().createdAt:', doc.data().createdAt);
     messages.push({
       _id: doc.id,
       text: doc.data().message,

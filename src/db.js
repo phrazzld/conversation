@@ -19,6 +19,7 @@ const getMessages = async deviceId => {
   return db
     .collection('messages')
     .where('device', '==', deviceId)
+    .orderBy('createdAt')
     .get();
 };
 
