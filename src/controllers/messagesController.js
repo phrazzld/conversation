@@ -27,8 +27,7 @@ const getRandomInt = max => {
 const getRandomQuote = () => {
   const quotesPath = path.join(__dirname, '..', 'quotes.json');
   const quotes = JSON.parse(fs.readFileSync(quotesPath, 'utf8')).quotes;
-  const i = getRandomInt(quotes.length);
-  return quotes[i];
+  return quotes[getRandomInt(quotes.length)];
 };
 
 const rejectInvalidPostMessagesRequests = (req, res) => {
@@ -40,11 +39,9 @@ const rejectInvalidPostMessagesRequests = (req, res) => {
   }
 };
 
-const getRandomMeme = snapshot => {
-  let memes = [];
-  snapshot.forEach(meme => {
-    memes.push({id: meme.id, data: meme.data()});
-  });
+const getRandomMeme = () => {
+  const memesPath = path.join(__dirname, '..', 'memes.json');
+  const memes = JSON.parse(fs.readFileSync(memesPath, 'utf8')).memes;
   return memes[getRandomInt(memes.length)];
 };
 
@@ -60,13 +57,8 @@ const postMessages = async (req, res) => {
     const intent = getIntentFromBlob(responseBlob);
     let agentMessage = getMessageFromBlob(responseBlob);
     if (intent.displayName === 'memes') {
-      const snapshot = await db.getMemes();
-      if (snapshot.empty) {
-        agentMessage = getRandomQuote();
-      } else {
-        let meme = getRandomMeme(snapshot);
-        return res.status(200).json({meme: meme});
-      }
+      let meme = getRandomMeme();
+      return res.status(200).json({meme: meme});
     } else if (intent.isFallback) {
       agentMessage = getRandomQuote();
     }
