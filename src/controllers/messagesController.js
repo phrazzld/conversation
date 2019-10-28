@@ -58,6 +58,7 @@ const postMessages = async (req, res) => {
     let agentMessage = getMessageFromBlob(responseBlob);
     if (intent.displayName === 'memes') {
       let meme = getRandomMeme();
+      await db.saveAgentImageMessage(meme, deviceId);
       return res.status(200).json({meme: meme});
     } else if (intent.isFallback) {
       agentMessage = getRandomQuote();
@@ -80,6 +81,7 @@ const rejectInvalidGetMessagesRequests = (req, res) => {
 
 const formatMessages = snapshot => {
   let messages = [];
+  const avatar = 'https://f4.bcbits.com/img/a2965037780_10.jpg';
   snapshot.forEach(doc => {
     messages.push({
       _id: doc.id,
@@ -89,6 +91,8 @@ const formatMessages = snapshot => {
       createdAt: new Date(doc.data().createdAt.seconds * 1000),
       user: {
         _id: doc.data().from,
+        name: doc.data().from,
+        avatar: doc.data().from.indexOf('robopeterson' > -1) ? avatar : '',
       },
     });
   });
