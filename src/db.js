@@ -38,11 +38,11 @@ const saveUserMessage = async (userMessage, deviceId) => {
   }
 };
 
-const saveAgentImageMessage = async (image, deviceId) => {
+const saveAgentImageMessage = async (imageUrl, deviceId) => {
   const now = new Date();
   try {
     const messageRef = await db.collection('messages').add({
-      image: image,
+      image: imageUrl,
       device: deviceId,
       from: config.robopetersonProjectId,
       to: deviceId,

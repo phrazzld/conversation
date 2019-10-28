@@ -58,7 +58,7 @@ const postMessages = async (req, res) => {
     let agentMessage = getMessageFromBlob(responseBlob);
     if (intent.displayName === 'memes') {
       let meme = getRandomMeme();
-      await db.saveAgentImageMessage(meme, deviceId);
+      await db.saveAgentImageMessage(meme.image, deviceId);
       return res.status(200).json({meme: meme});
     } else if (intent.isFallback) {
       agentMessage = getRandomQuote();
