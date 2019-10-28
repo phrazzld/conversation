@@ -15,7 +15,6 @@ const handleDbError = (err, message) => {
 };
 
 const getMessages = async deviceId => {
-  console.log('db.getMessages | deviceId:', deviceId);
   return db
     .collection('messages')
     .where('device', '==', deviceId)
@@ -34,7 +33,6 @@ const saveUserMessage = async (userMessage, deviceId) => {
       createdAt: now,
       updatedAt: now,
     });
-    console.log(`Saved incoming message (id: ${messageRef.id})`);
   } catch (err) {
     handleDbError(err, 'Problem saving user message');
   }
@@ -51,7 +49,6 @@ const saveAgentMessage = async (agentMessage, deviceId) => {
       createdAt: now,
       updatedAt: now,
     });
-    console.log(`Saved outgoing message (id: ${messageRef.id})`);
   } catch (err) {
     handleDbError(err, 'Problem saving robopeterson message');
   }

@@ -79,16 +79,14 @@ const rejectInvalidGetMessagesRequests = (req, res) => {
 };
 
 const formatMessages = snapshot => {
-  console.log('formatMessages');
   let messages = [];
   snapshot.forEach(doc => {
-    console.log('doc.data().createdAt:', doc.data().createdAt);
     messages.push({
       _id: doc.id,
       text: doc.data().message,
       image: doc.data().image,
       video: doc.data().video,
-      createdAt: doc.data().createdAt,
+      createdAt: new Date(doc.data().createdAt.seconds * 1000),
       user: {
         _id: doc.data().from,
       },
@@ -98,10 +96,8 @@ const formatMessages = snapshot => {
 };
 
 const getMessages = async (req, res) => {
-  console.log('getMessages()');
   try {
     rejectInvalidGetMessagesRequests(req, res);
-    console.log('req.params.deviceId:', req.params.deviceId);
     const snapshot = await db.getMessages(req.params.deviceId);
     if (snapshot.empty) {
       console.log('No matching documents');
