@@ -78,6 +78,23 @@ const rejectInvalidGetMessagesRequests = (req, res) => {
   }
 };
 
+const formatMessages = snapshot => {
+  let messages = [];
+  snapshot.forEach(doc => {
+    messages.push({
+      _id: doc.id,
+      text: doc.data().message,
+      image: doc.data().image,
+      video: doc.data().video,
+      createdAt: doc.data().createdAt,
+      user: {
+        _id: doc.data().from,
+      },
+    });
+  });
+  return messages;
+};
+
 const getMessages = async (req, res) => {
   try {
     rejectInvalidGetMessagesRequests(req, res);
@@ -86,10 +103,7 @@ const getMessages = async (req, res) => {
       console.log('No matching documents');
       return res.status(204).json({});
     } else {
-      let messages = [];
-      snapshot.forEach(doc => {
-        messages.push({id: doc.id, data: doc.data()});
-      });
+      let messages = formatMessages(snapshot);
       return res.status(200).json(messages);
     }
   } catch (err) {
