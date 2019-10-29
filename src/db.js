@@ -54,6 +54,22 @@ const saveAgentImageMessage = async (imageUrl, deviceId) => {
   }
 };
 
+const saveAgentVideoMessage = async (videoUrl, deviceId) => {
+  const now = new Date();
+  try {
+    const messageRef = await db.collection('messages').add({
+      video: videoUrl,
+      device: deviceId,
+      from: config.robopetersonProjectId,
+      to: deviceId,
+      createdAt: now,
+      updatedAt: now,
+    });
+  } catch (err) {
+    handleDbError(err, 'Problem saving robopeterson video message');
+  }
+};
+
 const saveAgentMessage = async (agentMessage, deviceId) => {
   const now = new Date();
   try {
@@ -73,6 +89,7 @@ const saveAgentMessage = async (agentMessage, deviceId) => {
 module.exports = {
   saveAgentMessage,
   saveAgentImageMessage,
+  saveAgentVideoMessage,
   saveUserMessage,
   getMessages,
 };
