@@ -54,11 +54,11 @@ const saveAgentImageMessage = async (imageUrl, deviceId) => {
   }
 };
 
-const saveAgentVideoMessage = async (videoUrl, deviceId) => {
+const saveAgentVideoMessage = async (videoTitle, videoUrl, deviceId) => {
   const now = new Date();
   try {
     const messageRef = await db.collection('messages').add({
-      video: videoUrl,
+      message: `${videoTitle}\n${videoUrl}`,
       device: deviceId,
       from: config.robopetersonProjectId,
       to: deviceId,
