@@ -30,6 +30,18 @@ const getRandomQuote = () => {
   return quotes[getRandomInt(quotes.length)];
 };
 
+const getRandomVideo = () => {
+  const videosPath = path.join(__dirname, '..', 'videos.json');
+  const videos = JSON.parse(fs.readFileSyn(videosPath, 'utf8')).videos;
+  return videos[getRandomInt(videos.length)];
+};
+
+const getRandomMeme = () => {
+  const memesPath = path.join(__dirname, '..', 'memes.json');
+  const memes = JSON.parse(fs.readFileSync(memesPath, 'utf8')).memes;
+  return memes[getRandomInt(memes.length)];
+};
+
 const rejectInvalidPostMessagesRequests = (req, res) => {
   if (req.body.query == null || req.body.deviceId == null) {
     console.error('Required parameter(s) undefined.');
@@ -37,12 +49,6 @@ const rejectInvalidPostMessagesRequests = (req, res) => {
       error: 'Invalid request: required parameter(s) are undefined.',
     });
   }
-};
-
-const getRandomMeme = () => {
-  const memesPath = path.join(__dirname, '..', 'memes.json');
-  const memes = JSON.parse(fs.readFileSync(memesPath, 'utf8')).memes;
-  return memes[getRandomInt(memes.length)];
 };
 
 const postMessages = async (req, res) => {
@@ -60,6 +66,10 @@ const postMessages = async (req, res) => {
       let meme = getRandomMeme();
       await db.saveAgentImageMessage(meme.image, deviceId);
       return res.status(200).json({meme: meme});
+    } else if (intent.displayName === 'videos') {
+      let video = getRandomVideo();
+      await db.saveAgentVideoMessage(video.url);
+      return res.status(200).json({text: video.title, video: video.url});
     } else if (intent.isFallback) {
       agentMessage = getRandomQuote();
     }
