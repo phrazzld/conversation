@@ -69,7 +69,7 @@ const postMessages = async (req, res) => {
     } else if (intent.displayName === 'videos') {
       let video = getRandomVideo();
       await db.saveAgentVideoMessage(video.url, deviceId);
-      return res.status(200).json({text: video.title, video: video.url});
+      return res.status(200).json({message: video.title, video: video.url});
     } else if (intent.isFallback) {
       agentMessage = getRandomQuote();
     }
