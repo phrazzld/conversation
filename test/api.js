@@ -1,11 +1,11 @@
-// robopeterson-api/test/api.js
+// conversation/test/api.js
 
 require('module-alias/register');
 const request = require('supertest');
 const app = require('@root/app');
 const proctor = require('@test/proctor');
 const expect = require('chai').expect;
-const TEST_DEVICE = 'C-137';
+const TEST_DEVICE = 'HT001-C137';
 const helloQuery = {query: 'Hello', deviceId: TEST_DEVICE};
 
 describe('/api/messages', function() {

@@ -1,4 +1,4 @@
-// robopeterson-api/agent.js
+// conversation/agent.js
 
 require('module-alias/register');
 const config = require('@root/config');
@@ -21,16 +21,13 @@ const generateDialogflowRequest = (query, languageCode, formattedSession) => {
   };
 };
 
-const generateNewSession = (
-  client,
-  projectId = config.robopetersonProjectId,
-) => {
+const generateNewSession = (client, projectId = config.projectId) => {
   return client.sessionPath(projectId, generateSessionId());
 };
 
 // TODO: Right now every fresh query to the agent generates and uses a new session.
 // It should not.
-const query = async (projectId = config.robopetersonProjectId, query) => {
+const query = async (query, projectId = config.projectId) => {
   const client = new dialogflow.v2.SessionsClient();
   const formattedSession = generateNewSession(client, projectId);
   const request = generateDialogflowRequest(query, 'en-US', formattedSession);

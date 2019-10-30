@@ -1,11 +1,11 @@
-// robopeterson-api/controllers/messagesController.js
+// conversation/controllers/messagesController.js
 
 require('module-alias/register');
 const config = require('@root/config');
 const fs = require('fs');
 const path = require('path');
 const db = require('@root/db');
-const robopeterson = require('@root/agent');
+const agent = require('@root/agent');
 
 const getMessageFromBlob = blob => {
   return blob.queryResult.fulfillmentText;
@@ -25,20 +25,17 @@ const getRandomInt = max => {
 };
 
 const getRandomQuote = () => {
-  const quotesPath = path.join(__dirname, '..', 'quotes.json');
-  const quotes = JSON.parse(fs.readFileSync(quotesPath, 'utf8')).quotes;
+  const quotes = process.env.QUOTES.quotes;
   return quotes[getRandomInt(quotes.length)];
 };
 
 const getRandomVideo = () => {
-  const videosPath = path.join(__dirname, '..', 'videos.json');
-  const videos = JSON.parse(fs.readFileSync(videosPath, 'utf8')).videos;
+  const videos = process.env.VIDEOS.videos;
   return videos[getRandomInt(videos.length)];
 };
 
 const getRandomMeme = () => {
-  const memesPath = path.join(__dirname, '..', 'memes.json');
-  const memes = JSON.parse(fs.readFileSync(memesPath, 'utf8')).memes;
+  const memes = process.env.MEMES.memes;
   return memes[getRandomInt(memes.length)];
 };
 
@@ -56,10 +53,7 @@ const postMessages = async (req, res) => {
     rejectInvalidPostMessagesRequests(req, res);
     const {query: userMessage, deviceId} = req.body;
     await db.saveUserMessage(userMessage, deviceId);
-    const responseBlob = await robopeterson.query(
-      config.robopetersonProjectId,
-      userMessage,
-    );
+    const responseBlob = await agent.query(userMessage, config.projectId);
     const intent = getIntentFromBlob(responseBlob);
     let agentMessage = getMessageFromBlob(responseBlob);
     if (intent.displayName === 'memes') {
@@ -91,7 +85,7 @@ const rejectInvalidGetMessagesRequests = (req, res) => {
 
 const formatMessages = snapshot => {
   let messages = [];
-  const avatar = 'https://f4.bcbits.com/img/a2965037780_10.jpg';
+  const avatar = process.env.AGENT_AVATAR_URL;
   snapshot.forEach(doc => {
     messages.push({
       _id: doc.id,
@@ -102,7 +96,7 @@ const formatMessages = snapshot => {
       user: {
         _id: doc.data().from,
         name: doc.data().from,
-        avatar: doc.data().from.indexOf('robopeterson' > -1) ? avatar : '',
+        avatar: doc.data().from === config.projectId ? avatar : '',
       },
     });
   });

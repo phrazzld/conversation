@@ -1,13 +1,15 @@
-// robopeterson-api/app.js
+// conversation/app.js
 
 require('module-alias/register');
 const express = require('express');
 const app = express();
+require('dotenv').config();
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const messagesController = require('@controllers/messagesController');
 
+// Always wear a helmet
 app.use(helmet());
 app.use(
   helmet.contentSecurityPolicy({

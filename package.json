@@ -1,7 +1,7 @@
 {
-  "name": "robopeterson-api",
+  "name": "conversation",
   "version": "1.0.0",
-  "description": "API for the RoboPeterson Dialogflow agent.",
+  "description": "API for managing chatbot interactions.",
   "main": "server.js",
   "scripts": {
     "build": "npm run clean && babel -d ./build ./src -s",
@@ -9,7 +9,7 @@
     "clean": "rm -rf ./build && mkdir build",
     "heroku-postbuild": "npm install && npm run build",
     "preinstall": "node ./gcpSetup.js",
-    "test": "mocha | bunyan"
+    "test": "mocha"
   },
   "author": "Phaedrus Raznikov",
   "license": "ISC",
@@ -21,6 +21,7 @@
     "bunyan": "^1.8.12",
     "cookie-parser": "^1.4.3",
     "dialogflow": "^0.12.2",
+    "dotenv": "^8.2.0",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "fs": "0.0.1-security",

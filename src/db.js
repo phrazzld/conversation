@@ -1,11 +1,11 @@
-// robopeterson-api/db.js
+// conversation/db.js
 
 require('module-alias/register');
 const config = require('@root/config');
 const Firestore = require('@google-cloud/firestore');
 
 const db = new Firestore({
-  projectId: config.robopetersonProjectId,
+  projectId: config.projectId,
   keyFilename: process.env.GCP_KEY_FILE,
 });
 
@@ -15,11 +15,15 @@ const handleDbError = (err, message) => {
 };
 
 const getMessages = async deviceId => {
-  return db
-    .collection('messages')
-    .where('device', '==', deviceId)
-    .orderBy('createdAt', 'desc')
-    .get();
+  try {
+    return db
+      .collection('messages')
+      .where('device', '==', deviceId)
+      .orderBy('createdAt', 'desc')
+      .get();
+  } catch (err) {
+    handleDbError(err);
+  }
 };
 
 const saveUserMessage = async (userMessage, deviceId) => {
@@ -29,7 +33,7 @@ const saveUserMessage = async (userMessage, deviceId) => {
       message: userMessage,
       device: deviceId,
       from: deviceId,
-      to: config.robopetersonProjectId,
+      to: config.projectId,
       createdAt: now,
       updatedAt: now,
     });
@@ -44,13 +48,13 @@ const saveAgentImageMessage = async (imageUrl, deviceId) => {
     const messageRef = await db.collection('messages').add({
       image: imageUrl,
       device: deviceId,
-      from: config.robopetersonProjectId,
+      from: config.projectId,
       to: deviceId,
       createdAt: now,
       updatedAt: now,
     });
   } catch (err) {
-    handleDbError(err, 'Problem saving robopeterson image message');
+    handleDbError(err, 'Problem saving agent image message');
   }
 };
 
@@ -60,13 +64,13 @@ const saveAgentVideoMessage = async (videoTitle, videoUrl, deviceId) => {
     const messageRef = await db.collection('messages').add({
       message: `${videoTitle}\n${videoUrl}`,
       device: deviceId,
-      from: config.robopetersonProjectId,
+      from: config.projectId,
       to: deviceId,
       createdAt: now,
       updatedAt: now,
     });
   } catch (err) {
-    handleDbError(err, 'Problem saving robopeterson video message');
+    handleDbError(err, 'Problem saving agent video message');
   }
 };
 
@@ -76,13 +80,13 @@ const saveAgentMessage = async (agentMessage, deviceId) => {
     const messageRef = await db.collection('messages').add({
       message: agentMessage,
       device: deviceId,
-      from: config.robopetersonProjectId,
+      from: config.projectId,
       to: deviceId,
       createdAt: now,
       updatedAt: now,
     });
   } catch (err) {
-    handleDbError(err, 'Problem saving robopeterson message');
+    handleDbError(err, 'Problem saving agent message');
   }
 };
 
